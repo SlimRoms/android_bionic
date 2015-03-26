@@ -33,6 +33,7 @@
  * cache line.
  */
 
+<<<<<<< HEAD
 // Assumes neon instructions and a cache line size of 32 bytes.
 
 ENTRY_PRIVATE(MEMCPY_BASE)
@@ -120,4 +121,50 @@ ENTRY_PRIVATE(MEMCPY_BASE)
 
         ldmfd       sp!, {r0, lr}
         bx          lr
+=======
+.Lneon_copy_64_loop_nopld:
+	vld1.32	{q8, q9}, [r1]!
+	vld1.32	{q10, q11}, [r1]!
+	subs	r12, r12, #1
+	vst1.32	{q8, q9}, [r0]!
+	vst1.32	{q10, q11}, [r0]!
+	bne	.Lneon_copy_64_loop_nopld
+	ands	r2, r2, #0x3f
+	.cfi_restore r0
+	.cfi_adjust_cfa_offset -4
+	beq	.Lneon_exit
+.Lneon_copy_32_a:
+	movs	r3, r2, lsl #27
+	bcc	.Lneon_16
+	vld1.32	{q0,q1}, [r1]!
+	vst1.32	{q0,q1}, [r0]!
+.Lneon_16:
+	bpl	.Lneon_lt16
+	vld1.32	{q8}, [r1]!
+	vst1.32	{q8}, [r0]!
+	ands	r2, r2, #0x0f
+	beq	.Lneon_exit
+.Lneon_lt16:
+	movs	r3, r2, lsl #29
+	itttt	cs
+	ldrcs	r3, [r1], #4
+	strcs	r3, [r0], #4
+	ldrcs	r3, [r1], #4
+	strcs	r3, [r0], #4
+	itt	mi
+	ldrmi	r3, [r1], #4
+	strmi	r3, [r0], #4
+.Lneon_lt4:
+	movs	r2, r2, lsl #31
+	itt	cs
+	ldrhcs	r3, [r1], #2
+	strhcs	r3, [r0], #2
+	itt	mi
+	ldrbmi	r3, [r1]
+	strbmi	r3, [r0]
+.Lneon_exit:
+	pop	{r0, lr}
+	bx	lr
+        //.cfi_endproc
+>>>>>>> 0073685... Fix mismerges.
 END(MEMCPY_BASE)
