@@ -9,6 +9,8 @@ cc_library_static {
 
     // We need to access Bionic private headers in the linker.
     include_dirs: ["bionic/libc"],
+
+    static_libs: ["libasync_safe"],
 }
 
 cc_binary {
@@ -100,11 +102,14 @@ cc_binary {
     ],
 
     product_variables: {
+        debuggable: {
+            cppflags: ["-DUSE_LD_CONFIG_FILE"],
+        },
         slim: {
             needs_text_relocations: {
                 cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
             },
-        }
+        },
     },
 
     cppflags: ["-Wold-style-cast"],
@@ -127,13 +132,7 @@ cc_binary {
         "libbase",
         "libz",
 
-        "libdebuggerd_handler_core",
         "libdebuggerd_handler_fallback",
-        "libdebuggerd",
-        "libbacktrace",
-        "libunwind",
-        "liblzma",
-        "libcutils",
 
         "liblog",
         "libc++_static",
