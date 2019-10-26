@@ -198,7 +198,7 @@ cc_defaults {
         debuggable: {
             cppflags: ["-DUSE_LD_CONFIG_FILE"],
         },
-        gzosp: {
+        slim: {
             needs_text_relocations: {
                 cppflags: ["-DTARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS"],
             },
